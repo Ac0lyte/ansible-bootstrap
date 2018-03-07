@@ -1,0 +1,78 @@
+# ansible bootstrap aws setup
+#
+# The purpose of this is to createa new AWS user with API credentials
+# that gets used for ALL additional infrastructure tasks.
+#
+# A new group and profiles also get created for this user.
+# policies are listed in an array and the json is kept
+# in files named policies/{{ groupname }}_{{ policy }}_policy.json
+
+---
+
+- name: Bootstrap AWS environment
+  hosts: localhost
+  connection: local
+
+  vars:
+    account_id: '000000000000'
+    username: 'terraform'  
+    groupname: 'builders'
+    policies:
+      - god
+    s3_bucket: "{{ account_id }}-terraform"
+    region: 'us-west-2'
+
+  tasks:
+    - name: Create builders group
+      iam:
+        iam_type: group
+        name: "{{ groupname }}"
+        state: present
+      register: new_group
+
+
+    - name: Create terraform user
+      iam:
+        iam_type: user
+        name: "{{ username }}"
+        state: present
+        access_key_state: create
+        groups: "{{ groupname }}"
+      register: new_user
+
+
+    - name: Allow builders to access AWS API
+      iam_policy:
+         iam_type: group
+         state: present
+         iam_name: "{{ groupname }}"
+         policy_name: "{{ groupname }}_{{ item }}_access"
+         policy_document: "policies/{{ groupname }}_{{ item }}_policy.json"
+      with_items: "{{ policies }}"
+
+
+    - name: Create S3 bucket
+      s3_bucket:
+        name: "{{ s3_bucket }}"
+        region: "{{ region }}"
+        state: present
+        versioning: yes
+        policy: "{{ lookup('template', 'policies/s3_bucket_policy.json') }}"
+        tags:
+          name: "{{ s3_bucket }}"
+          lifecycle: "permenant"
+          purpose: "terraform state"
+
+
+    - name: show access key
+      debug:
+        msg: "aws_access_key_id = {{ new_user.user_meta.access_keys[0].access_key_id }}"
+
+    - name: show secret key
+      debug:
+        msg: "aws_secret_access_key= {{ new_user.user_meta.access_keys[0].secret_access_key }}"
+      when: new_user.user_meta.access_keys[0].secret_access_key is defined
+
+
+
+
