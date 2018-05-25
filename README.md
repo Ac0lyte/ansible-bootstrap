@@ -28,5 +28,5 @@ Save these, you will not see them again.
 - Send then via email to anyone
 - Check them into a git repo
 - Post them in a chat room
-- Anythn else really stupid
+- Anything else really stupid
 
