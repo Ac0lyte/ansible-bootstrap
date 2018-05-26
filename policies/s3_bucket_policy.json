@@ -3,7 +3,7 @@
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "AWSterraformBucket",
+      "Sid": "AWSterraformBucket_Root",
       "Action": "s3:*",
       "Effect": "Allow",
       "Resource": [
@@ -12,7 +12,20 @@
       ],
       "Principal": {
         "AWS": [ 
-            "arn:aws:iam::{{ account_id }}:root",
+            "arn:aws:iam::{{ account_id }}:root"
+        ],
+      }
+    },
+    {
+      "Sid": "AWSterraformBucket_{{ username }}",
+      "Action": "s3:*",
+      "Effect": "Allow",
+      "Resource": [
+        "arn:aws:s3:::{{ s3_bucket }}",
+        "arn:aws:s3:::{{ s3_bucket }}/*"
+      ],
+      "Principal": {
+        "AWS": [ 
             "arn:aws:iam::{{ account_id }}:user/{{ username }}"
         ],
       }
