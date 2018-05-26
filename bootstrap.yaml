@@ -39,6 +39,21 @@
         access_key_state: create
         groups: "{{ groupname }}"
       register: new_user
+      
+    - name: Save access credentials
+      copy:
+        content: "{{ username }}:{{ new_user.user_meta.access_keys[0].access_key_id }}:{{ new_user.user_meta.access_keys[0].secret_access_key }}"
+        path: "{{ username }}.csv"
+      when: new_user.user_meta.access_keys[0].secret_access_key is defined
+
+    - name: show access key
+      debug:
+        msg: "aws_access_key_id = {{ new_user.user_meta.access_keys[0].access_key_id }}"
+
+    - name: show secret key
+      debug:
+        msg: "aws_secret_access_key= {{ new_user.user_meta.access_keys[0].secret_access_key }}"
+      when: new_user.user_meta.access_keys[0].secret_access_key is defined
 
 
     - name: Allow builders to access AWS API
@@ -49,22 +64,6 @@
          policy_name: "{{ groupname }}_{{ item }}_access"
          policy_document: "policies/{{ groupname }}_{{ item }}_policy.json"
       with_items: "{{ policies }}"
-      
-    - name: Save access credentials
-      copy:
-        content: "{{ username }}:{{ new_user.user_meta.access_keys[0].access_key_id }}:{{ new_user.user_meta.access_keys[0].secret_access_key }}"
-        path: "{{ username }}.csv"
-      when: new_user.user_meta.access_keys[0].secret_access_key is defined
-
-
-    - name: show access key
-      debug:
-        msg: "aws_access_key_id = {{ new_user.user_meta.access_keys[0].access_key_id }}"
-
-    - name: show secret key
-      debug:
-        msg: "aws_secret_access_key= {{ new_user.user_meta.access_keys[0].secret_access_key }}"
-      when: new_user.user_meta.access_keys[0].secret_access_key is defined
 
 
     - name: Create S3 bucket
