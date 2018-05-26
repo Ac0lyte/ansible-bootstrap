@@ -65,6 +65,8 @@
       with_items: "{{ policies }}"
 
 
+    - debug: msg = "S3 Bucket : {{ s3_bucket }}"
+
     - name: Create S3 bucket
       s3_bucket:
         name: "{{ s3_bucket }}"
