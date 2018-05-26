@@ -3,7 +3,7 @@
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "AWSterraformBucket_Root",
+      "Sid": "AWSterraformBucketRoot",
       "Action": "s3:*",
       "Effect": "Allow",
       "Resource": [
@@ -17,7 +17,7 @@
       }
     },
     {
-      "Sid": "AWSterraformBucket_{{ username }}",
+      "Sid": "AWSterraformBucket{{ username }}",
       "Action": "s3:*",
       "Effect": "Allow",
       "Resource": [
