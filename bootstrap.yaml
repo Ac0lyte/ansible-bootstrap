@@ -53,6 +53,7 @@
     - name: Pause for a few min to allow AWS to sync it's IAM stuffs.
       pause:
           seconds: 180
+      when: new_user.user_meta.access_keys[0].secret_access_key is defined
 
     - name: Allow builders to access AWS API
       iam_policy:
